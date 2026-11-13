@@ -1,0 +1,13 @@
+{
+  "name": "merak-kabinesi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An interactive cabinet of historical technological curiosities, in Turkish.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node scripts/server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs"
+  }
+}
