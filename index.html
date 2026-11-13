@@ -1,29 +1,30 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#182c4c">
-  <meta name="description" content="Sesi betonla dinleyen, resimleri deliklerden geçiren, desenleri kartlara saklayan dokuz tuhaf icat. Hikâyelerini oku, düzeneklerini çalıştır.">
-  <meta property="og:title" content="Merak Kabinesi">
-  <meta property="og:description" content="Dokuz tuhaf icat. Dokuz çalışan düşünce. Biraz kurcalamak serbest.">
+  <meta name="description" content="Nine unusual inventions that gather sound with concrete, scan pictures through openings and store patterns on cards. Read their stories and try their mechanisms." data-i18n-content="Nine unusual inventions that gather sound with concrete, scan pictures through openings and store patterns on cards. Read their stories and try their mechanisms.">
+  <meta property="og:title" content="Cabinet of Curiosities" data-i18n-content="Cabinet of Curiosities">
+  <meta property="og:description" content="Nine unusual inventions. Nine working ideas. Feel free to explore." data-i18n-content="Nine unusual inventions. Nine working ideas. Feel free to explore.">
   <meta property="og:type" content="website">
-  <title>Merak Kabinesi — Biraz kurcalamak serbest</title>
+  <title>Cabinet of Curiosities — Feel free to explore</title>
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <link rel="preload" href="./assets/fonts/fraunces.ttf" as="font" type="font/ttf" crossorigin>
   <script type="module" src="./src/app.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">İçeriğe geç</a>
+  <a class="skip-link" href="#main" data-i18n="Skip to content">Skip to content</a>
   <header class="site-header wrap">
-    <a class="brand" href="#/" aria-label="Merak Kabinesi, ana sayfa"><svg viewBox="0 0 42 48" aria-hidden="true"><path d="M4 4H38V43H4ZM4 17H38M4 30H38M20 4V43M9 43V47M33 43V47"/><circle cx="12" cy="10" r="3"/><path d="M26 8L32 13M27 22V27M25 25H32M10 35L15 39M10 39L15 35"/></svg><span>Merak<br>kabinesi</span></a>
-    <nav aria-label="Ana gezinme"><a href="#/koleksiyon" data-nav="collection">Koleksiyon</a><a href="#/rotalar" data-nav="tours">Rotalar</a><a href="#/defter" data-nav="notebook">Not defterim <span id="saved-count" class="nav-count" hidden>0</span></a><a href="#/kaynaklar" data-nav="sources">Kaynaklar</a></nav>
+    <a class="brand" href="#/" aria-label="Cabinet of Curiosities, home" data-i18n-label="Cabinet of Curiosities, home"><svg viewBox="0 0 42 48" aria-hidden="true"><path d="M4 4H38V43H4ZM4 17H38M4 30H38M20 4V43M9 43V47M33 43V47"/><circle cx="12" cy="10" r="3"/><path d="M26 8L32 13M27 22V27M25 25H32M10 35L15 39M10 39L15 35"/></svg><span data-i18n-html="Cabinet&lt;br&gt;of curiosities">Cabinet<br>of curiosities</span></a>
+    <nav aria-label="Main navigation" data-i18n-label="Main navigation"><a href="#/collection" data-nav="collection" data-i18n="Collection">Collection</a><a href="#/tours" data-nav="tours" data-i18n="Routes">Routes</a><a href="#/notebook" data-nav="notebook"><span data-i18n="My notebook">My notebook</span> <span id="saved-count" class="nav-count" hidden>0</span></a><a href="#/sources" data-nav="sources" data-i18n="Sources">Sources</a></nav>
+    <label class="language-picker"><span class="sr-only" data-i18n="Language">Language</span><select id="language" aria-label="Language" data-i18n-label="Language"><option value="en" lang="en">English</option><option value="tr" lang="tr">Türkçe</option></select></label>
   </header>
-  <main id="main" tabindex="-1"><div class="wrap initial-loading"><h1>Merak Kabinesi</h1><p>Çekmeceler açılıyor…</p></div></main>
-  <noscript><div class="wrap noscript"><h2>Kabinenin düzenekleri JavaScript kullanıyor</h2><p>Koleksiyonda ses aynası, mekanik televizyon, pnömatik posta, Antikythera mekanizması, Jacquard tezgâhı, theremin, harmonograf, zoetrop ve sihirli fener var. Etkileşimli sergileri açmak için JavaScript’i etkinleştirebilirsin.</p></div></noscript>
-  <footer class="site-footer wrap"><a class="footer-name" href="#/">Merak kabinesi</a><p>İyi bir soru, bazen bir nesnenin içinde saklanır.</p><div><a href="#/hakkinda">Bu kabine hakkında</a><a href="https://github.com/kulieff21/merak-kabinesi" target="_blank" rel="noopener noreferrer">GitHub’da incele</a><button class="text-button" id="print-page" type="button">Sayfayı yazdır</button></div><span class="footer-date">İlk seçki · Kasım 2026</span></footer>
-  <dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-heading"><h2 id="diagram-title">Deney çizimi</h2><button type="button" class="button secondary small" id="close-diagram" autofocus>Çizimi kapat</button></div><p>Deneyin anlık çizimi. Yakından incelemek için yatay kaydırabilirsin.</p><div class="diagram-viewport" tabindex="0" aria-label="Büyütülmüş çizim, gerektiğinde yatay kaydır"><img id="diagram-image" alt=""></div></dialog>
+  <main id="main" tabindex="-1"><div class="wrap initial-loading"><h1>Cabinet of Curiosities</h1><p>Opening the drawers…</p></div></main>
+  <noscript><div class="wrap noscript"><h2>The cabinet’s mechanisms use JavaScript</h2><p>Explore an acoustic mirror, mechanical television, pneumatic mail, the Antikythera mechanism, a Jacquard loom, a theremin, a harmonograph, a zoetrope and a magic lantern. Enable JavaScript for the interactive exhibits and language selector.</p></div></noscript>
+  <footer class="site-footer wrap"><a class="footer-name" href="#/" data-i18n="Cabinet of Curiosities">Cabinet of Curiosities</a><p data-i18n="A good question sometimes hides inside an object.">A good question sometimes hides inside an object.</p><div><a href="#/about" data-i18n="About this cabinet">About this cabinet</a><a href="https://github.com/kulieff21/merak-kabinesi" target="_blank" rel="noopener noreferrer" data-i18n="View on GitHub">View on GitHub</a><button class="text-button" id="print-page" type="button" data-i18n="Print this page">Print this page</button></div><span class="footer-date" data-i18n="First selection · November 2026">First selection · November 2026</span></footer>
+  <dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-heading"><h2 id="diagram-title" data-i18n="Diagram snapshot">Diagram snapshot</h2><button type="button" class="button secondary small" id="close-diagram" autofocus data-i18n="Close diagram">Close diagram</button></div><p data-i18n="A snapshot of the experiment. Scroll horizontally for a closer look.">A snapshot of the experiment. Scroll horizontally for a closer look.</p><div class="diagram-viewport" tabindex="0" aria-label="Enlarged diagram; scroll horizontally if needed" data-i18n-label="Enlarged diagram; scroll horizontally if needed"><img id="diagram-image" alt=""></div></dialog>
   <div id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   <div id="toast" class="toast" role="status" hidden></div>
 </body>

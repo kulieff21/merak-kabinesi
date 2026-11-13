@@ -36,11 +36,11 @@ test('notebook safely rejects corrupt, unknown, and duplicate state', () => {
 });
 test('Turkish search handles dotted and dotless letters and direct routes are robust', () => {
   assert.equal(normalizeSearch('İŞIK'), 'isik'); assert.equal(normalizeSearch('Pnömatik'), 'pnomatik');
-  assert.deepEqual(parseRoute('#/eser/jacquard?rota=dusunce'), { page: 'eser', id: 'jacquard', tour: 'dusunce' });
+  assert.deepEqual(parseRoute('#/eser/jacquard?rota=dusunce'), { page: 'exhibit', id: 'jacquard', tour: 'dusunce' });
   assert.equal(parseRoute('#/%E0%A4%A').page, 'missing'); assert.equal(parseRoute('').page, 'home');
 });
 test('static entry points use local assets and include a no-script explanation', async () => {
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-  assert.ok(html.includes('lang="tr"')); assert.ok(html.includes('<noscript>')); assert.ok(html.includes('name="viewport"'));
+  assert.ok(html.includes('lang="en"')); assert.ok(html.includes('<noscript>')); assert.ok(html.includes('name="viewport"'));
   assert.ok(!/<script[^>]+src="https?:/i.test(html)); assert.ok(!/fonts\.googleapis/.test(html));
 });

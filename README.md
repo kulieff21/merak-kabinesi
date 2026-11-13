@@ -1,8 +1,10 @@
-# Merak Kabinesi
+# Cabinet of Curiosities
 
-An interactive Turkish-language cabinet of historical technological curiosities. Nine unusual objects connect material history with mechanisms you can operate in the browser.
+An interactive cabinet of historical technological curiosities, in English and Turkish. Nine unusual objects connect material history with mechanisms you can operate in the browser.
 
-**[Explore the collection](https://kulieff21.github.io/merak-kabinesi/)** · [Source book](https://kulieff21.github.io/merak-kabinesi/#/kaynaklar)
+**[Explore in English](https://kulieff21.github.io/merak-kabinesi/?lang=en)** · [Türkçe](https://kulieff21.github.io/merak-kabinesi/?lang=tr) · [Source book](https://kulieff21.github.io/merak-kabinesi/?lang=en#/sources)
+
+English is the default on a first visit. The language selector changes the complete collection, mechanisms, diagram labels, source notes and notebook interface. Your choice stays in your browser. Shared links can select a language with `?lang=en` or `?lang=tr`; existing Turkish exhibit links and saved notebook entries continue to work.
 
 ![The blue cabinet and its nine original specimen illustrations](docs/screenshots/cabinet-desktop.png)
 
@@ -20,7 +22,7 @@ An interactive Turkish-language cabinet of historical technological curiosities.
 | Zoetrope | Compare discrete frames, rotation speed and an open/closed shutter illustration |
 | Magic lantern | Move the slide and screen; find the thin-lens image plane |
 
-Each object has a dedicated link, an original illustration, three short interpretive sections, a timeline, cited sources and a disclosure of the educational model's assumptions. The collection has 21 distinct source records, three curated routes, Turkish-aware search, a local visit/saved-object notebook, JSON export, diagram enlargement, and print styles.
+Each object has a dedicated link, an original illustration, three short interpretive sections, a timeline, cited sources and a disclosure of the educational model's assumptions. The collection has 21 distinct source records, three curated routes, accent-tolerant search, a local visit/saved-object notebook, JSON export, diagram enlargement, and print styles.
 
 ![An editable punched card controlling repeated woven motifs](docs/screenshots/jacquard-worktable.png)
 
@@ -49,9 +51,10 @@ For installed Chrome/Chromium browser checks, keep the preview running and use:
 
 ```sh
 node scripts/browser-qa.mjs
+node scripts/browser-qa.mjs --language=tr
 ```
 
-No runtime framework, API keys, dependency installation or third-party network calls are needed. The only application storage is the visitor's notebook in that browser. Audio is off until explicitly enabled and closes when its exhibit is left.
+No runtime framework, API keys, dependency installation or third-party network calls are needed. The notebook and language preference are stored only in that browser. Audio is off until explicitly enabled and closes when its exhibit is left.
 
 <img src="docs/screenshots/cabinet-mobile.png" width="300" alt="The cabinet on a narrow mobile screen">
 

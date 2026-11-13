@@ -1,3 +1,4 @@
+import { t } from '../i18n.js';
 import { icon, format } from '../ui.js';
 
 export function range(id, label, min, max, step, value, unit = '') {
@@ -7,11 +8,11 @@ export function range(id, label, min, max, step, value, unit = '') {
 export function select(id, label, options, selected) {
   return `<label class="control" for="${id}"><span class="control-top">${label}</span><select id="${id}">${options.map(([value, title]) => `<option value="${value}" ${String(value) === String(selected) ? 'selected' : ''}>${title}</option>`).join('')}</select></label>`;
 }
-export function controls(extra = '', playLabel = 'Çalıştır') {
-  return `${extra}<div class="control-buttons"><button class="button small" type="button" data-play>${icon('play', 15)} <span>${playLabel}</span></button><button class="button secondary small" type="button" data-step aria-label="Bir adım ilerlet">${icon('arrow', 15)} Adım</button><button class="button secondary small" type="button" data-reset aria-label="Hareketi başa al">${icon('reset', 15)}</button></div><div class="lab-readout" data-readout aria-live="off"></div>`;
+export function controls(extra = '', playLabel = t("Run")) {
+  return `${extra}<div class="control-buttons"><button class="button small" type="button" data-play>${icon('play', 15)} <span>${playLabel}</span></button><button class="button secondary small" type="button" data-step aria-label="${t("Advance one step")}">${icon('arrow', 15)} ${t("Step")}</button><button class="button secondary small" type="button" data-reset aria-label="${t("Rewind the motion")}">${icon('reset', 15)}</button></div><div class="lab-readout" data-readout aria-live="off"></div>`;
 }
 export function stage(root, { label, art = '', controls: controlMarkup = '', canvas = false, extraClass = '' }) {
-  root.innerHTML = `<div class="demo-stage ${extraClass}">${canvas ? `<canvas width="720" height="430" role="img" aria-label="${label}">${label}</canvas>` : `<svg viewBox="0 0 720 430" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${art}</svg>`}<button class="expand-diagram" type="button" data-expand aria-label="Çizimi büyüt">${icon('external', 15)}</button></div><div class="demo-controls">${controlMarkup}</div>`;
+  root.innerHTML = `<div class="demo-stage ${extraClass}">${canvas ? `<canvas width="720" height="430" role="img" aria-label="${label}">${label}</canvas>` : `<svg viewBox="0 0 720 430" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${art}</svg>`}<button class="expand-diagram" type="button" data-expand aria-label="${t("Enlarge diagram")}">${icon('external', 15)}</button></div><div class="demo-controls">${controlMarkup}</div>`;
   const controller = new AbortController();
   const on = (target, event, callback) => target.addEventListener(event, callback, { signal: controller.signal });
   root.querySelectorAll('input[type=range]').forEach(input => on(input, 'input', () => { const output = root.querySelector(`#${input.id}-value`); if (output) output.textContent = format(Number(input.value), Number(input.dataset.digits)) + input.dataset.unit; }));
@@ -23,10 +24,10 @@ export function canvasContext(canvas) {
   const ctx = canvas.getContext('2d'); ctx.scale(ratio, ratio);
   return ctx;
 }
-export function player(kit, draw, { speed = 1, end = () => 10, loop = false, step = 0.15, label = 'Çalıştır' } = {}) {
+export function player(kit, draw, { speed = 1, end = () => 10, loop = false, step = 0.15, label = t("Run") } = {}) {
   let time = 0; let running = false; let frame = 0; let previous = 0; let lastDraw = 0; let destroyed = false;
   const button = kit.$('[data-play]');
-  function buttonState() { if (button) { button.innerHTML = `${icon(running ? 'pause' : 'play', 15)} <span>${running ? 'Duraklat' : label}</span>`; button.setAttribute('aria-pressed', running); } }
+  function buttonState() { if (button) { button.innerHTML = `${icon(running ? 'pause' : 'play', 15)} <span>${running ? t("Pause") : label}</span>`; button.setAttribute('aria-pressed', running); } }
   function pause() { running = false; cancelAnimationFrame(frame); previous = 0; buttonState(); }
   function tick(now) {
     if (!running || destroyed) return;

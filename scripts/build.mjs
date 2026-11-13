@@ -1,4 +1,4 @@
-import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 
@@ -10,5 +10,6 @@ await mkdir(output, { recursive: true });
 for (const name of ['index.html', 'styles.css', 'src', 'assets', '404.html', '.nojekyll']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true });
 }
-await writeFile(resolve(output, 'build-info.json'), JSON.stringify({ name: 'merak-kabinesi', version: '1.0.0', exhibits: 9 }) + '\n');
+const metadata = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+await writeFile(resolve(output, 'build-info.json'), JSON.stringify({ name: metadata.name, version: metadata.version, exhibits: 9, defaultLanguage: 'en', languages: ['en', 'tr'] }) + '\n');
 console.log('Standalone static site prepared in dist/.');

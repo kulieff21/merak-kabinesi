@@ -1,3 +1,4 @@
+import { canonicalPage, exhibitId, tourId } from './routes.js';
 const key = 'merak-kabinesi.v1';
 export function readNotebook(storage, validIds) {
   try {
@@ -19,5 +20,6 @@ export function parseRoute(hash) {
   try { decoded = decodeURIComponent(hash.replace(/^#\/?/, '')); } catch { return { page: 'missing' }; }
   const [path, search = ''] = decoded.split('?');
   const [page = '', id] = path.split('/');
-  return { page: page || 'home', id, tour: new URLSearchParams(search).get('rota') };
+  const params = new URLSearchParams(search);
+  return { page: canonicalPage(page), id: exhibitId(id), tour: tourId(params.get('tour') || params.get('rota')) };
 }

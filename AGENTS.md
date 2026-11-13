@@ -1,10 +1,11 @@
-# Merak Kabinesi
+# Cabinet of Curiosities
 
-A Turkish-language, browser-based cabinet of historical technological curiosities.
+A bilingual, browser-based cabinet of historical technological curiosities, with English as the default and Turkish available through the language selector.
 
 ## Working agreement
 
-- Keep application copy and exhibit narratives in Turkish. Write code identifiers, commits, and repository documentation in English.
+- English is the default for the interface, exhibits, metadata, exports, documentation, screenshots and GitHub presentation. Preserve complete Turkish translations in the locale resources. Write code identifiers, commits and repository documentation in English.
+- Localize every user-facing string, including Canvas/SVG labels, controls, accessibility text and error messages. Keep locale resources in parity. Preserve legacy links and notebook IDs; use English canonical links for new navigation.
 - Use browser-native HTML, CSS, SVG, Canvas, and Web Audio. No runtime framework or package installation is needed.
 - Prefer original vector illustrations to reproducing museum images. Record the licenses of bundled third-party assets.
 - Verify historical claims against museum, heritage, original research, or other primary sources. Each exhibit must link its sources and distinguish evidence from interpretation.

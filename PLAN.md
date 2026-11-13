@@ -4,6 +4,8 @@
 
 Build a complete, carefully researched digital museum that Elmar can explore without participating in production. The authorized result includes this project directory, a public personal GitHub repository, regular commits and pushes, and no additional GitHub contributors or collaborators.
 
+English is the default throughout the site and GitHub presentation. Preserve a complete Turkish edition through the language selector, including all narratives, mechanism controls, diagrams and source notes. Publish the updated site on GitHub Pages.
+
 ## Collection
 
 Nine objects, each with an original illustration, a dedicated address, a historical narrative, an interactive mechanism, source annotations, and an honest account of the model's limits:
@@ -35,6 +37,7 @@ Nine objects, each with an original illustration, a dedicated address, a histori
 - [x] Add curated routes, visit notebook, sources, and printable views.
 - [x] Inspect desktop and mobile views; exercise keyboard, navigation, persistence, and models.
 - [x] Finish documentation and prepare static publication; verify repository authorship and collaborator identity.
+- [x] Add the complete English edition, retained Turkish edition and persistent language selection; preserve earlier links and notebook entries.
 
 ## Evidence policy
 
