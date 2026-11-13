@@ -15,6 +15,8 @@ let query = '';
 let cleanup = () => {};
 let initial = true;
 let activeHash = location.hash;
+const diagramDialog = document.getElementById('diagram-dialog');
+let diagramUrl;
 const scrollPositions = new Map();
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
@@ -66,6 +68,7 @@ function updateSavedCount() {
   count.textContent = notebook.saved.length; count.hidden = !notebook.saved.length;
 }
 function render() {
+  if (diagramDialog.open) diagramDialog.close();
   cleanup(); cleanup = () => {};
   const route = parseRoute(location.hash);
   const item = route.page === 'eser' && getExhibit(route.id);
@@ -84,7 +87,7 @@ function render() {
   else if (route.page === 'hakkinda') { main.innerHTML = aboutPage(); document.title = 'Bu kabine hakkında — Merak Kabinesi'; }
   else { main.innerHTML = '<div class="wrap not-found"><h1>Bu çekmece burada değil.</h1><p>Koleksiyonda başka bir nesne seçebilirsin.</p><a class="button" href="#/koleksiyon">Koleksiyona dön</a></div>'; document.title = 'Çekmece bulunamadı — Merak Kabinesi'; }
   document.querySelectorAll('[data-nav]').forEach(link => {
-    const selected = (link.dataset.nav === 'collection' && (isHome || item)) || (link.dataset.nav === 'notebook' && route.page === 'defter') || (link.dataset.nav === 'sources' && route.page === 'kaynaklar') || (link.dataset.nav === 'tours' && route.page === 'rotalar');
+    const selected = (link.dataset.nav === 'collection' && ((isHome && route.page !== 'rotalar') || item)) || (link.dataset.nav === 'notebook' && route.page === 'defter') || (link.dataset.nav === 'sources' && route.page === 'kaynaklar') || (link.dataset.nav === 'tours' && route.page === 'rotalar');
     if (selected) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
   updateSavedCount();
@@ -98,6 +101,17 @@ function render() {
 window.addEventListener('hashchange', () => { scrollPositions.set(activeHash, window.scrollY); activeHash = location.hash; render(); });
 document.addEventListener('input', event => { if (event.target.id === 'collection-search') { query = event.target.value; updateGallery(); } });
 document.addEventListener('click', event => {
+  const expand = event.target.closest('[data-expand]');
+  if (expand) {
+    const demo = expand.closest('.demo');
+    const running = demo.querySelector('[data-play][aria-pressed="true"], [data-audio][aria-pressed="true"]');
+    running?.click();
+    const drawing = demo.querySelector('.demo-stage > canvas, .demo-stage > svg');
+    const image = document.getElementById('diagram-image');
+    if (drawing.tagName.toLowerCase() === 'canvas') image.src = drawing.toDataURL('image/png');
+    else { const copy = drawing.cloneNode(true); copy.setAttribute('width', '1080'); copy.setAttribute('height', '645'); const style = document.createElementNS('http://www.w3.org/2000/svg', 'style'); style.textContent = 'text{font-family:Arial,sans-serif;fill:#526674;font-size:12px}'; copy.prepend(style); diagramUrl = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)], { type: 'image/svg+xml' })); image.src = diagramUrl; }
+    image.alt = drawing.getAttribute('aria-label'); document.getElementById('diagram-title').textContent = `${document.querySelector('h1').textContent} · Deney çizimi`; diagramDialog.showModal();
+  }
   const save = event.target.closest('[data-save]');
   if (save) {
     const id = save.dataset.save;
@@ -122,5 +136,9 @@ document.addEventListener('click', event => {
 });
 document.querySelector('.skip-link').addEventListener('click', event => { event.preventDefault(); main.focus(); });
 document.getElementById('print-page').addEventListener('click', () => window.print());
+document.getElementById('close-diagram').addEventListener('click', () => diagramDialog.close());
+diagramDialog.addEventListener('click', event => { if (event.target === diagramDialog) diagramDialog.close(); });
+diagramDialog.addEventListener('close', () => { if (diagramUrl) { URL.revokeObjectURL(diagramUrl); diagramUrl = null; } document.getElementById('diagram-image').removeAttribute('src'); });
 window.addEventListener('pagehide', () => cleanup());
+window.addEventListener('pageshow', event => { if (event.persisted) render(); });
 render();

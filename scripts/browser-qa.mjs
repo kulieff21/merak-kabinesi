@@ -12,11 +12,13 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const work = resolve(root, '.local');
 const out = resolve(work, 'qa');
 await mkdir(out, { recursive: true });
+for (const name of ['merak-kabinesi-defterim.json', 'merak-kabinesi-harmonograf.svg']) await rm(join(out, name), { force: true });
 const profile = await mkdtemp(join(work, 'qa-chrome-'));
 const chromePath = process.env.CHROME_PATH || ['C:/Program Files/Google/Chrome/Application/chrome.exe', '/usr/bin/google-chrome', '/usr/bin/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'].find(existsSync);
 if (!chromePath) throw new Error('Set CHROME_PATH to an installed Chrome or Chromium executable.');
 const base = process.env.QA_URL || 'http://127.0.0.1:4178/';
-const smoke = process.argv.includes('--smoke');
+const narrow = process.argv.includes('--narrow');
+const smoke = process.argv.includes('--smoke') || narrow;
 const port = 9400 + Math.floor(Math.random() * 600);
 const child = spawn(chromePath, ['--headless=new', '--disable-gpu', '--disable-extensions', '--disable-background-networking', '--disable-sync', '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--autoplay-policy=user-gesture-required', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, `--disk-cache-dir=${join(profile, 'cache')}`, 'about:blank'], { stdio: 'ignore', windowsHide: true, env: { ...process.env, TEMP: profile, TMP: profile } });
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -45,8 +47,9 @@ async function capture(name, full = false) {
   const screenshot = await send('Page.captureScreenshot', params); await writeFile(join(out, `${name}.png`), Buffer.from(screenshot.data, 'base64'));
 }
 async function layout(name, width) {
-  const result = await evaluate(`(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,h1:document.querySelectorAll('h1').length,overflow:[...document.querySelectorAll('main *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&(r.right>innerWidth+2||r.left< -2)&&getComputedStyle(e).position!=='absolute'&&e.tagName!=='svg'&&e.tagName!=='path'}).slice(0,8).map(e=>({tag:e.tagName,cls:e.className?.baseVal??e.className,right:e.getBoundingClientRect().right}))}))()`);
-  assert.equal(result.width, width); assert.ok(result.scroll <= width + 1, `${name} overflow: ${JSON.stringify(result)}`); assert.equal(result.h1, 1);
+  const result = await evaluate(`(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,h1:document.querySelectorAll('h1').length,textOverflow:(()=>{if(document.documentElement.scrollWidth<=innerWidth)return [];const walker=document.createTreeWalker(document.querySelector('main'),NodeFilter.SHOW_TEXT);const bad=[];while(walker.nextNode()){const n=walker.currentNode;if(!n.textContent.trim())continue;const r=document.createRange();r.selectNodeContents(n);for(const b of r.getClientRects()){if(b.right>innerWidth+1)bad.push({text:n.textContent.slice(0,75),parent:n.parentElement.tagName,cls:n.parentElement.className?.baseVal??n.parentElement.className,right:b.right});}}return bad.slice(0,12);})(),overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&(r.right>innerWidth+2||r.left< -2)}).slice(0,8).map(e=>({tag:e.tagName,cls:e.className?.baseVal??e.className,right:e.getBoundingClientRect().right}))}))()`);
+  if (result.scroll > width + 1) console.log('Layout isolation:', await evaluate(`(()=>{const selectors=['.hero-copy','.hero-figure','.manifesto','#collection','.tour-section','.closing-note','.site-header','.site-footer','main'];return selectors.map(selector=>{const e=document.querySelector(selector);if(!e)return null;const previous=e.getAttribute('style');e.style.setProperty('display','none','important');const width=document.documentElement.scrollWidth;if(previous===null)e.removeAttribute('style');else e.setAttribute('style',previous);return {selector,width};});})()`));
+  assert.equal(result.width, width, `${name} viewport: ${JSON.stringify(result)}`); assert.ok(result.scroll <= width + 1, `${name} overflow: ${JSON.stringify(result)}`); assert.equal(result.h1, 1);
   checks.push(`${name}: ${width}px layout`); return result;
 }
 async function screenshotLab(id, width) { await scrollTo('#experiment'); await capture(`${id}-${width}-lab`); }
@@ -69,11 +72,12 @@ try {
   await new Promise((resolve, reject) => { ws.addEventListener('open', resolve, { once: true }); ws.addEventListener('error', reject, { once: true }); });
   for (const method of ['Page.enable', 'Runtime.enable', 'Network.enable', 'WebAudio.enable']) await send(method);
   await send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: out });
-  await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+  const startWidth = narrow ? 320 : 1440;
+  await send('Emulation.setDeviceMetricsOverride', { width: startWidth, height: 1000, deviceScaleFactor: 1, mobile: false });
   await send('Page.navigate', { url: base }); await until(`document.querySelectorAll('#collection-grid .specimen').length === 9`); await evaluate('document.fonts.ready'); await sleep(200);
   await check('home has nine semantic cards and nine cabinet links', async () => { assert.equal(await evaluate(`document.querySelectorAll('.cabinet-object').length`), 9); assert.equal(await evaluate(`document.documentElement.lang`), 'tr'); });
-  await layout('home', 1440); await capture('home-1440'); await capture('home-1440-full', true);
-  await scrollTo('#collection'); await capture('collection-1440');
+  await layout('home', startWidth); await capture(`home-${startWidth}`); await capture(`home-${startWidth}-full`, true);
+  await scrollTo('#collection'); await capture(`collection-${startWidth}`);
   if (!smoke) {
     await check('Turkish-aware ASCII search and empty recovery', async () => {
       await set('#collection-search', 'pnomatik'); assert.equal(await evaluate(`document.querySelectorAll('#collection-grid .specimen').length`), 1);
@@ -89,15 +93,15 @@ try {
       await click('[data-export]');
     });
   }
-  for (const width of [1440, 390]) {
-    await send('Emulation.setDeviceMetricsOverride', { width, height: width < 700 ? 844 : 1000, deviceScaleFactor: 1, mobile: width < 700 });
+  for (const width of (narrow ? [320] : [1440, 390])) {
+    await send('Emulation.setDeviceMetricsOverride', { width, height: width < 700 ? 844 : 1000, deviceScaleFactor: 1, mobile: !narrow && width < 700 });
     if (width === 390) { await evaluate(`location.hash='#/'`); await until(`document.querySelector('.cabinet-art')!==null`); await sleep(100); await layout('home', width); await capture('home-390'); await capture('home-390-full', true); }
     for (const item of exhibits) {
       await route(item.id); await layout(item.id, width); await capture(`${item.id}-${width}-top`);
       assert.ok((await evaluate(`document.querySelector('[data-readout]')?.textContent || ''`)).length > 15, `${item.id} missing model output`);
       await screenshotLab(item.id, width);
       if (smoke) continue;
-      if (item.id === 'ses-aynalari') await check(`acoustic reflection controls at ${width}px`, async () => { assert.match(await evaluate(`document.querySelector('[data-readout]').textContent`), /9 tanesi/); await set('#sound-angle', 20); assert.ok(!/9 tanesi/.test(await evaluate(`document.querySelector('[data-readout]').textContent`))); await click('[data-step]'); });
+      if (item.id === 'ses-aynalari') await check(`acoustic controls and enlarged diagram at ${width}px`, async () => { assert.match(await evaluate(`document.querySelector('[data-readout]').textContent`), /9 tanesi/); await set('#sound-angle', 20); assert.ok(!/9 tanesi/.test(await evaluate(`document.querySelector('[data-readout]').textContent`))); await click('[data-step]'); await click('[data-expand]'); await until(`document.querySelector('#diagram-dialog').open && document.querySelector('#diagram-image').naturalWidth>0`); await capture(`diagram-enlarged-${width}`); await send('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 }); await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 }); await until(`!document.querySelector('#diagram-dialog').open`); });
       if (item.id === 'mekanik-televizyon') await check(`television scans, pauses and changes resolution at ${width}px`, async () => {
         await click('[data-reset]'); const before = await canvasHash(); await click('[data-play]'); await sleep(450); await click('[data-play]'); const after = await canvasHash(); assert.notEqual(before, after); await sleep(150); assert.equal(after, await canvasHash()); await set('#tv-lines', 48, 'change'); assert.match(await evaluate(`document.querySelector('[data-readout]').textContent`), /48 \/ 48/);
       });
@@ -108,10 +112,10 @@ try {
       });
       if (item.id === 'theremin') await check(`theremin is opt-in, changes pitch and closes audio at ${width}px`, async () => {
         assert.equal(await evaluate(`document.querySelector('[data-audio]').getAttribute('aria-pressed')`), 'false'); await set('#theremin-pitch', 100); assert.match(await evaluate(`document.querySelector('[data-readout]').textContent`), /880 Hz/); await click('[data-audio]'); await until(`document.querySelector('[data-audio]').getAttribute('aria-pressed')==='true'`); assert.ok(audioEvents.some(event => event.method === 'WebAudio.audioNodeCreated'));
-        await scrollTo('.site-header'); await until(`document.querySelector('[data-audio]').getAttribute('aria-pressed')==='false'`); await screenshotLab(item.id, width);
+        await scrollTo('.site-footer'); await until(`document.querySelector('[data-audio]').getAttribute('aria-pressed')==='false'`); await screenshotLab(item.id, width);
       });
       if (item.id === 'harmonograf') await check(`harmonograph redraw and SVG export at ${width}px`, async () => {
-        const before = await canvasHash(); await click('[data-ratio="1"]'); await set('#harm-phase', 90); await set('#harm-damping', 0); assert.notEqual(before, await canvasHash()); await click('[data-download]');
+        assert.equal(await evaluate(`document.querySelector('#harm-damping-value').textContent`), '0,035'); const before = await canvasHash(); await click('[data-ratio="1"]'); await set('#harm-phase', 90); await set('#harm-damping', 0); assert.notEqual(before, await canvasHash()); await click('[data-download]');
       });
       if (item.id === 'zoetrop') await check(`zoetrope sampling and shutter comparison at ${width}px`, async () => { await set('#zoe-frames', 6, 'change'); await set('#zoe-speed', 1.2); assert.match(await evaluate(`document.querySelector('[data-readout]').textContent`), /7,2 poz/); await click('#zoe-shutter'); assert.match(await evaluate(`document.querySelector('[data-readout]').textContent`), /kapalı/); await click('[data-step]'); });
       if (item.id === 'sihirli-fener') await check(`lantern focus solves both worked examples at ${width}px`, async () => { await click('[data-focus]'); assert.equal(await evaluate(`Number(document.querySelector('#lens-screen').value)`), 240); await set('#lens-object', 90); await click('[data-focus]'); assert.equal(await evaluate(`Number(document.querySelector('#lens-screen').value)`), 720); await click('[data-lens-reset]'); });
@@ -139,6 +143,7 @@ try {
   await writeFile(join(out, smoke ? 'smoke.json' : 'report.json'), JSON.stringify({ checks, count: checks.length, errors, outsideRequests: outside, audio: audioEvents.map(event => ({ method: event.method, contextId: event.params.contextId || event.params.context?.contextId })), routes: exhibits.map(item => item.id), screenshots: out }, null, 2));
   console.log(`COMPLETE: ${checks.length} checks; no page errors or third-party requests. Evidence: ${out}`);
 } catch (error) {
+  try { await capture('failure-current'); } catch {}
   await writeFile(join(out, 'failure.json'), JSON.stringify({ error: error.stack, checks, errors }, null, 2)); console.error(error); process.exitCode = 1;
 } finally {
   if (ws) ws.close(); child.kill(); await new Promise(resolve => child.once('exit', resolve));

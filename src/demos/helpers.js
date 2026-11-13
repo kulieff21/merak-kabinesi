@@ -1,19 +1,20 @@
 import { icon, format } from '../ui.js';
 
 export function range(id, label, min, max, step, value, unit = '') {
-  return `<label class="control" for="${id}"><span class="control-top"><span>${label}</span><output id="${id}-value" for="${id}" aria-live="off">${format(value, 2)}${unit}</output></span><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" data-unit="${unit}"></label>`;
+  const digits = String(step).split('.')[1]?.length || 0;
+  return `<label class="control" for="${id}"><span class="control-top"><span>${label}</span><output id="${id}-value" for="${id}" aria-live="off">${format(value, digits)}${unit}</output></span><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" data-unit="${unit}" data-digits="${digits}"></label>`;
 }
 export function select(id, label, options, selected) {
   return `<label class="control" for="${id}"><span class="control-top">${label}</span><select id="${id}">${options.map(([value, title]) => `<option value="${value}" ${String(value) === String(selected) ? 'selected' : ''}>${title}</option>`).join('')}</select></label>`;
 }
 export function controls(extra = '', playLabel = 'Çalıştır') {
-  return `${extra}<div class="control-buttons"><button class="button small" type="button" data-play>${icon('play', 15)} <span>${playLabel}</span></button><button class="button secondary small" type="button" data-step aria-label="Bir adım ilerlet">${icon('arrow', 15)} Adım</button><button class="button secondary small" type="button" data-reset aria-label="Düzeneği sıfırla">${icon('reset', 15)}</button></div><div class="lab-readout" data-readout aria-live="off"></div>`;
+  return `${extra}<div class="control-buttons"><button class="button small" type="button" data-play>${icon('play', 15)} <span>${playLabel}</span></button><button class="button secondary small" type="button" data-step aria-label="Bir adım ilerlet">${icon('arrow', 15)} Adım</button><button class="button secondary small" type="button" data-reset aria-label="Hareketi başa al">${icon('reset', 15)}</button></div><div class="lab-readout" data-readout aria-live="off"></div>`;
 }
 export function stage(root, { label, art = '', controls: controlMarkup = '', canvas = false, extraClass = '' }) {
-  root.innerHTML = `<div class="demo-stage ${extraClass}">${canvas ? `<canvas width="720" height="430" role="img" aria-label="${label}">${label}</canvas>` : `<svg viewBox="0 0 720 430" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${art}</svg>`}</div><div class="demo-controls">${controlMarkup}</div>`;
+  root.innerHTML = `<div class="demo-stage ${extraClass}">${canvas ? `<canvas width="720" height="430" role="img" aria-label="${label}">${label}</canvas>` : `<svg viewBox="0 0 720 430" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${art}</svg>`}<button class="expand-diagram" type="button" data-expand aria-label="Çizimi büyüt">${icon('external', 15)}</button></div><div class="demo-controls">${controlMarkup}</div>`;
   const controller = new AbortController();
   const on = (target, event, callback) => target.addEventListener(event, callback, { signal: controller.signal });
-  root.querySelectorAll('input[type=range]').forEach(input => on(input, 'input', () => { const output = root.querySelector(`#${input.id}-value`); if (output) output.textContent = format(Number(input.value), 2) + input.dataset.unit; }));
+  root.querySelectorAll('input[type=range]').forEach(input => on(input, 'input', () => { const output = root.querySelector(`#${input.id}-value`); if (output) output.textContent = format(Number(input.value), Number(input.dataset.digits)) + input.dataset.unit; }));
   return { $: selector => root.querySelector(selector), on, destroy: () => controller.abort() };
 }
 export function canvasContext(canvas) {

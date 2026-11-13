@@ -41,6 +41,12 @@ export function lensImage(focalLength, objectDistance) {
   return { distance, magnification: -distance / objectDistance };
 }
 
+/** Heights of two paraxial rays at a screen, relative to the optical axis. */
+export function projectionRays(focalLength, objectDistance, screenDistance, objectHeight = 1) {
+  lensImage(focalLength, objectDistance);
+  return { parallel: -objectHeight + screenDistance * objectHeight / focalLength, central: screenDistance * objectHeight / objectDistance };
+}
+
 export function sampledFrame(seconds, revolutionsPerSecond, frames, shutter = true) {
   const continuous = ((seconds * revolutionsPerSecond) % 1 + 1) % 1;
   return shutter ? Math.floor(continuous * frames) / frames : continuous;

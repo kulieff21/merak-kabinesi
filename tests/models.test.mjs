@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { reflectedRay, capsuleMotion, metonic, oscillatorPoint, lensImage, sampledFrame, audioFrequency, patternRow, TAU } from '../src/math.js';
+import { reflectedRay, capsuleMotion, metonic, oscillatorPoint, lensImage, projectionRays, sampledFrame, audioFrequency, patternRow, TAU } from '../src/math.js';
 const near = (a, b, tolerance = 1e-9) => assert.ok(Math.abs(a - b) < tolerance, `${a} differs from ${b}`);
 
 test('parallel rays reach the focus of every supported parabolic mirror', () => {
@@ -53,6 +53,15 @@ test('thin-lens reciprocal relation holds throughout the controls', () => {
 test('zoetrope sampling quantizes position while preserving the cycle', () => {
   near(sampledFrame(.2, 1, 6), 1 / 6); near(sampledFrame(.2, 1, 6, false), .2);
   near(sampledFrame(1.2, 1, 6), 1 / 6); assert.equal(sampledFrame(1, 1, 12), 0);
+});
+test('the two illustrated projection rays meet at the computed image plane', () => {
+  for (const u of [90, 120, 161, 200]) {
+    const image = lensImage(80, u); const rays = projectionRays(80, u, image.distance, 12);
+    near(rays.parallel, rays.central); near(rays.central, -12 * image.magnification);
+  }
+});
+test('defocused screen receives separated rays on either side of focus', () => {
+  for (const distance of [140, 350]) { const rays = projectionRays(80, 120, distance, 12); assert.notEqual(rays.parallel, rays.central); }
 });
 test('theremin controls stay within three octaves including out-of-range inputs', () => {
   near(audioFrequency(0), 110); near(audioFrequency(1), 880); near(audioFrequency(.5), 110 * Math.sqrt(8));
