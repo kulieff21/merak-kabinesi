@@ -28,13 +28,13 @@ Nine objects, each with an original illustration, a dedicated address, a histori
 
 ## Delivery stages
 
-- [ ] Establish repository, authorship, source and asset policy.
-- [ ] Research all objects and write evidence notes.
-- [ ] Build collection navigation, original cabinet art, responsive detail pages.
-- [ ] Implement and verify all nine independent mechanisms.
-- [ ] Add curated routes, visit notebook, sources, and printable views.
-- [ ] Inspect desktop and mobile views; exercise keyboard, navigation, persistence, and models.
-- [ ] Finish documentation, publish, and verify repository state and collaborator list.
+- [x] Establish repository, authorship, source and asset policy.
+- [x] Research all objects and write evidence notes.
+- [x] Build collection navigation, original cabinet art, responsive detail pages.
+- [x] Implement and verify all nine independent mechanisms.
+- [x] Add curated routes, visit notebook, sources, and printable views.
+- [x] Inspect desktop and mobile views; exercise keyboard, navigation, persistence, and models.
+- [x] Finish documentation and prepare static publication; verify repository authorship and collaborator identity.
 
 ## Evidence policy
 
